@@ -337,7 +337,10 @@ config ARMCM_RAM_VECTORTABLE
     bool
     default y if MACH_STM32F0 && FLASH_APPLICATION_ADDRESS != 0x8000000
     default n
-
+config ARMCM_RAM_VECTORTABLE_SIZE
+    hex
+    default 0xC0 if MACH_STM32F0 && FLASH_START != 0x8000000
+    default 0x00
 
 ######################################################################
 # Clock

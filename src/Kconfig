@@ -304,6 +304,10 @@ config INITIAL_PINS
         pins will be set to output high - preface a pin with a '!'
         character to set that pin to output low.
 
+config BOOTLOADER_SIZE
+    hex
+    default 0x0000
+
 # The HAVE_x options allow boards to disable support for some commands
 # if the hardware does not support the feature.
 config HAVE_GPIO

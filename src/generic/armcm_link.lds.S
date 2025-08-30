@@ -11,8 +11,14 @@ OUTPUT_ARCH(arm)
 
 MEMORY
 {
-  rom (rx) : ORIGIN = CONFIG_FLASH_APPLICATION_ADDRESS , LENGTH = CONFIG_FLASH_SIZE
-  ram (rwx) : ORIGIN = CONFIG_RAM_START , LENGTH = CONFIG_RAM_SIZE
+  rom (rx) : ORIGIN = CONFIG_FLASH_START , LENGTH = CONFIG_FLASH_SIZE - CONFIG_BOOTLOADER_SIZE
+#if !CONFIG_ARMCM_RAM_VECTORTABLE
+  ram (rwx) : ORIGIN = CONFIG_RAM_START, LENGTH = CONFIG_RAM_SIZE
+#else
+  vt (rwx) : ORIGIN = CONFIG_RAM_START , LENGTH = CONFIG_ARMCM_RAM_VECTORTABLE_SIZE
+  ram (rwx) : ORIGIN = CONFIG_RAM_START + CONFIG_ARMCM_RAM_VECTORTABLE_SIZE,
+    LENGTH = CONFIG_RAM_SIZE - CONFIG_ARMCM_RAM_VECTORTABLE_SIZE
+#endif
 }
 
 SECTIONS
@@ -26,18 +32,18 @@ SECTIONS
         *(.rodata .rodata*)
     } > rom
 
-    . = ALIGN(4);
-    _data_flash = .;
 
 #if CONFIG_ARMCM_RAM_VECTORTABLE
     .ram_vectortable (NOLOAD) : {
         _ram_vectortable_start = .;
         . = . + ( _text_vectortable_end - _text_vectortable_start ) ;
         _ram_vectortable_end = .;
-    } > ram
+    } > vt
 #endif
 
-    .data : AT (_data_flash)
+    _data_flash = LOADADDR(.data);
+
+    .data :
     {
         . = ALIGN(4);
         _data_start = .;
@@ -45,7 +51,7 @@ SECTIONS
         *(.data .data.*);
         . = ALIGN(4);
         _data_end = .;
-    } > ram
+    } > ram AT>rom
 
     .bss (NOLOAD) :
     {
