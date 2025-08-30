@@ -32,18 +32,18 @@ SECTIONS
         *(.rodata .rodata*)
     } > rom
 
+    . = ALIGN(4);
+    _data_flash = .;
 
 #if CONFIG_ARMCM_RAM_VECTORTABLE
     .ram_vectortable (NOLOAD) : {
         _ram_vectortable_start = .;
         . = . + ( _text_vectortable_end - _text_vectortable_start ) ;
         _ram_vectortable_end = .;
-    } > vt
+    } > ram
 #endif
 
-    _data_flash = LOADADDR(.data);
-
-    .data :
+    .data : AT (_data_flash)
     {
         . = ALIGN(4);
         _data_start = .;
@@ -51,7 +51,7 @@ SECTIONS
         *(.data .data.*);
         . = ALIGN(4);
         _data_end = .;
-    } > ram AT>rom
+    } > ram
 
     .bss (NOLOAD) :
     {
