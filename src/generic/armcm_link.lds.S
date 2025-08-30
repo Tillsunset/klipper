@@ -40,7 +40,7 @@ SECTIONS
         _ram_vectortable_start = .;
         . = . + ( _text_vectortable_end - _text_vectortable_start ) ;
         _ram_vectortable_end = .;
-    } > ram
+    } > vt
 #endif
 
     .data : AT (_data_flash)
